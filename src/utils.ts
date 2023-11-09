@@ -8,7 +8,8 @@ interface GasPriceData {
   fastest: number;
 }
 
-export async function getFastGasPrice(): Promise<BigNumber> {
+export async function getFastGasPrice(): Promise<BigNumber|undefined> {
+  return new Promise((resolve) => resolve(undefined)); // this uses default gas price
   const gasPriceData: GasPriceData = await got("https://www.etherchain.org/api/gasPriceOracle").json();
   return ethers.utils.parseUnits(gasPriceData.fastest.toString(), 9);
 }

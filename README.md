@@ -85,3 +85,39 @@ Default: 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:0xA0b86991c6218b36c1d19D4a2e
     Position liquidity WETH 0.5
     ****************************
 ```
+# Arbitrum fork
+
+To work in a local fork of Arbitrum:
+1. Make the fork using the mainnet chain id and with mining on an interval, e.g. for hardhat node set in `hardhat.config.ts`:
+```typescript
+const config: HardhatUserConfig = {
+  solidity: "0.8.19",
+  networks: {
+    hardhat: {
+        chainId: 42161,
+        forking: {
+            url: "https://arbitrum-mainnet.infura.io/v3/....",
+            blockNumber: 137658629,
+        },
+        mining: {
+            auto: false,
+            interval: 10000
+        }      
+    }
+  }  
+};
+```
+
+2. Make sure you have from the first token in the pair, e.g. for USDC-WETH you need USDC:
+```sh
+cast call 0xaf88d065e77c8cC2239327C5EDb3A432268e5831 "balanceOf(address)(uint256)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+cast call 0xaf88d065e77c8cC2239327C5EDb3A432268e5831 "balanceOf(address)(uint256)" 0xB38e8c17e38363aF6EbdCb3dAE12e0243582891D
+cast rpc hardhat_impersonateAccount 0xB38e8c17e38363aF6EbdCb3dAE12e0243582891D
+cast send 0xaf88d065e77c8cC2239327C5EDb3A432268e5831 --unlocked --from 0xB38e8c17e38363aF6EbdCb3dAE12e0243582891D "transfer(address,uint256)(bool)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 5000000000
+```
+Note: Using Uniswap to swap ETH for USDC manually with Metamask works for current fork but not for a fork in the past (likely because the price was different). Deploying liquidity manually in the fork doesn't work.
+
+3. Start the manager:
+```sh
+RPC_URL=http://127.0.0.1:8545/ PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 BUFFER_ETHER=9990 UNISWAP_PAIR=0xaf88d065e77c8cC2239327C5EDb3A432268e5831:0x82aF49447D8a07e3bd95BD0d56f35241523fBab1:3000 yarn start
+```

@@ -91,7 +91,7 @@ export class SwapManager {
     const address = await signer.getAddress();
     const { buyToken, sellToken, buyAmount } = await this.calculateSplitPurchase(address);
 
-    if (buyAmount.lessThan(0) || buyAmount.equalTo(0)) {
+    if (buyAmount.lessThan(0) || buyAmount.equalTo(0) || buyAmount.toFixed().startsWith('0.000')) {
       return;
     }
 

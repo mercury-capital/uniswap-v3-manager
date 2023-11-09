@@ -1,6 +1,6 @@
 import { ethers, Wallet, BigNumber } from "ethers";
 import { Pool } from "@uniswap/v3-sdk";
-import { CurrencyAmount } from "@uniswap/sdk-core";
+import { CurrencyAmount, Token, WETH9 } from "@uniswap/sdk-core";
 import { getPool, UniswapPositionFetcher } from "./uniswap";
 import { Config, getConfig } from "./config";
 import { ActivePosition, NewPosition, UniPosition } from "./position";
@@ -189,6 +189,8 @@ async function main() {
 
   const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
   const wallet = new Wallet(config.privateKey, provider);
+  const {chainId} = await provider.getNetwork();
+  WETH9[chainId] = new Token(chainId, '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', 18, 'WETH9', 'Wrapped Ether');
 
   console.log(`Searching for open positions on address: ${await wallet.getAddress()}`);
 
